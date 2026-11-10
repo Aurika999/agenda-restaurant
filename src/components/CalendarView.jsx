@@ -1,19 +1,21 @@
-import { DOW, MONTHS, iso, fmtDateLong, money, num, sortRes, todayIso, totals } from '../utils';
+import { iso, fmtDateLong, money, num, sortRes, todayIso, totals } from '../utils';
 import ReservationCard from './ReservationCard.jsx';
+import { useLang } from '../i18n.jsx';
 
 function Stats({ store, month }) {
+  const { t, months } = useLang();
   const today = todayIso();
   const active = store.reservations.filter((r) => r.status !== 'anulat');
   const inMonth = active.filter((r) => r.data.startsWith(month));
   const upcoming = active.filter((r) => r.data >= today);
   const guests = inMonth.reduce((s, r) => s + num(r.persoane) + num(r.copii), 0);
   const due = upcoming.reduce((s, r) => s + Math.max(0, totals(r).rest), 0);
-  const mName = MONTHS[+month.split('-')[1] - 1];
+  const mName = months[+month.split('-')[1] - 1];
   const items = [
-    [upcoming.length, 'Rezervări viitoare'],
-    [inMonth.length, `Evenimente în ${mName}`],
-    [guests, `Invitați în ${mName}`],
-    [money(due, store.settings.moneda), 'De încasat (viitoare)'],
+    [upcoming.length, t('Rezervări viitoare')],
+    [inMonth.length, t('Evenimente în {m}', { m: mName })],
+    [guests, t('Invitați în {m}', { m: mName })],
+    [money(due, store.settings.moneda), t('De încasat (viitoare)')],
   ];
   return (
     <div className="stats">
@@ -25,6 +27,7 @@ function Stats({ store, month }) {
 }
 
 export default function CalendarView({ store, sel, setSel, month, setMonth, onNew, onEdit, onContract }) {
+  const { t, lang, months, dow } = useLang();
   const [y, m] = month.split('-').map(Number);
   const today = todayIso();
   const first = new Date(y, m - 1, 1);
@@ -50,14 +53,14 @@ export default function CalendarView({ store, sel, setSel, month, setMonth, onNe
         <div className="card">
           <div className="cal-head">
             <button className="btn sm" onClick={() => shift(-1)}>‹</button>
-            <h2>{MONTHS[m - 1]} {y}</h2>
+            <h2>{months[m - 1]} {y}</h2>
             <div style={{ display: 'flex', gap: 6 }}>
-              <button className="btn sm" onClick={() => pick(today)}>Azi</button>
+              <button className="btn sm" onClick={() => pick(today)}>{t('Azi')}</button>
               <button className="btn sm" onClick={() => shift(1)}>›</button>
             </div>
           </div>
           <div className="cal">
-            {DOW.map((d) => <div className="dow" key={d}>{d}</div>)}
+            {dow.map((d) => <div className="dow" key={d}>{d}</div>)}
             {days.map((d) => {
               const s = iso(d);
               const rs = sortRes(store.reservations.filter((r) => r.data === s));
@@ -69,7 +72,7 @@ export default function CalendarView({ store, sel, setSel, month, setMonth, onNe
                   {rs.slice(0, 2).map((r) => (
                     <span key={r.id} className={'chip ' + r.status}>{(r.oraStart ? r.oraStart + ' ' : '') + r.client}</span>
                   ))}
-                  {rs.length > 2 && <span className="more">+{rs.length - 2} încă</span>}
+                  {rs.length > 2 && <span className="more">{t('+{n} încă', { n: rs.length - 2 })}</span>}
                 </div>
               );
             })}
@@ -77,14 +80,14 @@ export default function CalendarView({ store, sel, setSel, month, setMonth, onNe
         </div>
         <div className="card">
           <div className="day-title">
-            <h3>{fmtDateLong(sel)}</h3>
-            <button className="btn sm" onClick={() => onNew(sel)}>+ Adaugă</button>
+            <h3>{fmtDateLong(sel, lang)}</h3>
+            <button className="btn sm" onClick={() => onNew(sel)}>{t('+ Adaugă')}</button>
           </div>
           {dayRes.length
             ? dayRes.map((r) => (
               <ReservationCard key={r.id} r={r} cur={store.settings.moneda} onEdit={onEdit} onContract={onContract} />
             ))
-            : <div className="empty">Nicio rezervare în această zi.</div>}
+            : <div className="empty">{t('Nicio rezervare în această zi.')}</div>}
         </div>
       </div>
     </section>

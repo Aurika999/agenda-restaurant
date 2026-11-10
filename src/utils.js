@@ -1,6 +1,9 @@
 export const MONTHS = ['ianuarie', 'februarie', 'martie', 'aprilie', 'mai', 'iunie', 'iulie', 'august', 'septembrie', 'octombrie', 'noiembrie', 'decembrie'];
 export const DOW = ['Lun', 'Mar', 'Mie', 'Joi', 'Vin', 'Sâm', 'Dum'];
 const DOWL = ['duminică', 'luni', 'marți', 'miercuri', 'joi', 'vineri', 'sâmbătă'];
+// Ucraineană: luna la genitiv („10 листопада 2026”), zilele de la duminică
+const MONTHS_UK_GEN = ['січня', 'лютого', 'березня', 'квітня', 'травня', 'червня', 'липня', 'серпня', 'вересня', 'жовтня', 'листопада', 'грудня'];
+const DOWL_UK = ['неділя', 'понеділок', 'вівторок', 'середа', 'четвер', 'пʼятниця', 'субота'];
 
 export const STATUS = { confirmat: 'Confirmat', asteptare: 'În așteptare', anulat: 'Anulat' };
 export const EVENT_TYPES = ['Nuntă', 'Botez', 'Cununie civilă', 'Aniversare', 'Majorat', 'Petrecere corporate', 'Parastas', 'Cină / masă rezervată', 'Alt eveniment'];
@@ -23,12 +26,13 @@ export const iso = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.g
 export const parseIso = (s) => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); };
 export const todayIso = () => iso(new Date());
 
-export const fmtDate = (s) => {
+export const fmtDate = (s, lang = 'ro') => {
   if (!s) return '—';
   const d = parseIso(s);
-  return `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+  return `${d.getDate()} ${(lang === 'uk' ? MONTHS_UK_GEN : MONTHS)[d.getMonth()]} ${d.getFullYear()}`;
 };
-export const fmtDateLong = (s) => `${DOWL[parseIso(s).getDay()]}, ${fmtDate(s)}`;
+export const fmtDateLong = (s, lang = 'ro') =>
+  `${(lang === 'uk' ? DOWL_UK : DOWL)[parseIso(s).getDay()]}, ${fmtDate(s, lang)}`;
 
 export const money = (v, cur = 'EUR') =>
   `${num(v).toLocaleString('ro-RO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${cur || 'EUR'}`;

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { EMPTY_RESERVATION, EVENT_TYPES, STATUS, findConflicts, fmtDate, money, num, salaList, totals } from '../utils';
+import { useLang } from '../i18n.jsx';
 
 function Field({ label, cls = '', children }) {
   return <div className={'f ' + cls}><label>{label}</label>{children}</div>;
@@ -8,6 +9,7 @@ function Field({ label, cls = '', children }) {
 export default function ReservationModal({ initial, date, store, onSave, onDelete, onClose }) {
   const [f, setF] = useState(() => ({ ...EMPTY_RESERVATION, ...(initial || { data: date }) }));
   const [confirmDel, setConfirmDel] = useState(false);
+  const { t: tr, lang } = useLang();
   const formRef = useRef();
   const firstRef = useRef();
   const cur = store.settings.moneda;
@@ -29,79 +31,79 @@ export default function ReservationModal({ initial, date, store, onSave, onDelet
   return (
     <div className="overlay show" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
       <div className="modal">
-        <h2>{initial ? `Editează rezervarea${initial.nr ? ' · Contract nr. ' + initial.nr : ''}` : 'Rezervare nouă'}</h2>
+        <h2>{initial ? tr('Editează rezervarea') + (initial.nr ? tr(' · Contract nr. {n}', { n: initial.nr }) : '') : tr('Rezervare nouă')}</h2>
         <form ref={formRef} onSubmit={(e) => { e.preventDefault(); save(); }}>
           <fieldset>
-            <legend>Client</legend>
+            <legend>{tr('Client')}</legend>
             <div className="fg">
-              <Field label="Nume și prenume *" cls="c2">{inp('client', { required: true, ref: firstRef })}</Field>
-              <Field label="Telefon *">{inp('telefon', { required: true, type: 'tel' })}</Field>
-              <Field label="Email">{inp('email', { type: 'email' })}</Field>
-              <Field label="Adresă (pentru contract)" cls="c2">{inp('adresa')}</Field>
-              <Field label="CI seria / nr. sau CNP / CUI (opțional)" cls="c2">{inp('act')}</Field>
+              <Field label={tr('Nume și prenume *')} cls="c2">{inp('client', { required: true, ref: firstRef })}</Field>
+              <Field label={tr('Telefon *')}>{inp('telefon', { required: true, type: 'tel' })}</Field>
+              <Field label={tr('Email')}>{inp('email', { type: 'email' })}</Field>
+              <Field label={tr('Adresă (pentru contract)')} cls="c2">{inp('adresa')}</Field>
+              <Field label={tr('CI seria / nr. sau CNP / CUI (opțional)')} cls="c2">{inp('act')}</Field>
             </div>
           </fieldset>
 
           <fieldset>
-            <legend>Eveniment</legend>
+            <legend>{tr('Eveniment')}</legend>
             <div className="fg">
-              <Field label="Tip eveniment">
-                <select value={f.tip} onChange={set('tip')}>{EVENT_TYPES.map((x) => <option key={x}>{x}</option>)}</select>
+              <Field label={tr('Tip eveniment')}>
+                <select value={f.tip} onChange={set('tip')}>{EVENT_TYPES.map((x) => <option key={x} value={x}>{tr(x)}</option>)}</select>
               </Field>
-              <Field label="Data *">{inp('data', { type: 'date', required: true })}</Field>
-              <Field label="Ora început">{inp('oraStart', { type: 'time' })}</Field>
-              <Field label="Ora sfârșit">{inp('oraSfarsit', { type: 'time' })}</Field>
-              <Field label="Nr. persoane adulți *">{inp('persoane', { type: 'number', min: 1, required: true })}</Field>
-              <Field label="Nr. copii">{inp('copii', { type: 'number', min: 0 })}</Field>
-              <Field label="Sala / zona" cls="c2">
+              <Field label={tr('Data *')}>{inp('data', { type: 'date', required: true })}</Field>
+              <Field label={tr('Ora început')}>{inp('oraStart', { type: 'time' })}</Field>
+              <Field label={tr('Ora sfârșit')}>{inp('oraSfarsit', { type: 'time' })}</Field>
+              <Field label={tr('Nr. persoane adulți *')}>{inp('persoane', { type: 'number', min: 1, required: true })}</Field>
+              <Field label={tr('Nr. copii')}>{inp('copii', { type: 'number', min: 0 })}</Field>
+              <Field label={tr('Sala / zona')} cls="c2">
                 {inp('sala', { list: 'sali-list' })}
                 <datalist id="sali-list">{salaList(store.settings).map((s) => <option key={s} value={s} />)}</datalist>
               </Field>
-              <Field label="Status">
+              <Field label={tr('Status')}>
                 <select value={f.status} onChange={set('status')}>
-                  {Object.entries(STATUS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+                  {Object.entries(STATUS).map(([k, v]) => <option key={k} value={k}>{tr(v)}</option>)}
                 </select>
               </Field>
             </div>
             {conflicts.length > 0 && (
               <div className="warn show">
-                ⚠ Atenție: în aceeași zi{f.sala ? ' și sală' : ''} există deja:{' '}
+                {tr(f.sala ? '⚠ Atenție: în aceeași zi și sală există deja:' : '⚠ Atenție: în aceeași zi există deja:')}{' '}
                 {conflicts.map((r) => `${r.client} (${r.oraStart || '?'}${r.sala ? ', ' + r.sala : ''})`).join('; ')}
               </div>
             )}
           </fieldset>
 
           <fieldset>
-            <legend>Meniu și servicii</legend>
+            <legend>{tr('Meniu și servicii')}</legend>
             <div className="fg">
-              <Field label="Meniu ales (preparate)" cls="c4">
-                <textarea value={f.meniu} onChange={set('meniu')} placeholder="Aperitiv rece, Sarmale, Friptură de porc cu cartofi, Tort…" />
+              <Field label={tr('Meniu ales (preparate)')} cls="c4">
+                <textarea value={f.meniu} onChange={set('meniu')} placeholder={tr('Aperitiv rece, Sarmale, Friptură de porc cu cartofi, Tort…')} />
               </Field>
-              <Field label="Preț meniu / adult">{inp('pretPers', { type: 'number', min: 0, step: '0.01' })}</Field>
-              <Field label="Preț meniu / copil">{inp('pretCopil', { type: 'number', min: 0, step: '0.01' })}</Field>
-              <Field label="Băuturi" cls="c2">{inp('bauturi', { placeholder: 'Incluse în meniu / aduse de client / separat' })}</Field>
-              <Field label="Servicii suplimentare (descriere)" cls="c2">{inp('extra', { placeholder: 'Decor, formație, DJ, candy bar…' })}</Field>
-              <Field label="Cost servicii suplimentare">{inp('extraCost', { type: 'number', min: 0, step: '0.01' })}</Field>
-              <Field label="Avans achitat">{inp('avans', { type: 'number', min: 0, step: '0.01' })}</Field>
-              <Field label="Observații / cerințe speciale" cls="c4">
-                <textarea value={f.obs} onChange={set('obs')} placeholder="Alergii, meniu vegetarian, aranjarea meselor…" />
+              <Field label={tr('Preț meniu / adult')}>{inp('pretPers', { type: 'number', min: 0, step: '0.01' })}</Field>
+              <Field label={tr('Preț meniu / copil')}>{inp('pretCopil', { type: 'number', min: 0, step: '0.01' })}</Field>
+              <Field label={tr('Băuturi')} cls="c2">{inp('bauturi', { placeholder: tr('Incluse în meniu / aduse de client / separat') })}</Field>
+              <Field label={tr('Servicii suplimentare (descriere)')} cls="c2">{inp('extra', { placeholder: tr('Decor, formație, DJ, candy bar…') })}</Field>
+              <Field label={tr('Cost servicii suplimentare')}>{inp('extraCost', { type: 'number', min: 0, step: '0.01' })}</Field>
+              <Field label={tr('Avans achitat')}>{inp('avans', { type: 'number', min: 0, step: '0.01' })}</Field>
+              <Field label={tr('Observații / cerințe speciale')} cls="c4">
+                <textarea value={f.obs} onChange={set('obs')} placeholder={tr('Alergii, meniu vegetarian, aranjarea meselor…')} />
               </Field>
             </div>
             <div className="calc">
-              <span>Meniu: <b>{money(t.meniu, cur)}</b></span>
-              <span>Suplimentar: <b>{money(num(f.extraCost), cur)}</b></span>
-              <span>Total: <b>{money(t.total, cur)}</b></span>
-              <span>Rest de plată: <b>{money(t.rest, cur)}</b></span>
+              <span>{tr('Meniu:')} <b>{money(t.meniu, cur)}</b></span>
+              <span>{tr('Suplimentar:')} <b>{money(num(f.extraCost), cur)}</b></span>
+              <span>{tr('Total:')} <b>{money(t.total, cur)}</b></span>
+              <span>{tr('Rest de plată:')} <b>{money(t.rest, cur)}</b></span>
             </div>
           </fieldset>
           <button type="submit" hidden />
         </form>
 
         <div className="foot">
-          <div>{initial && <button className="btn danger" onClick={() => setConfirmDel(true)}>Șterge</button>}</div>
+          <div>{initial && <button className="btn danger" onClick={() => setConfirmDel(true)}>{tr('Șterge')}</button>}</div>
           <div style={{ display: 'flex', gap: 8 }}>
-            <button className="btn" onClick={onClose}>Renunță</button>
-            <button className="btn primary" onClick={save}>Salvează</button>
+            <button className="btn" onClick={onClose}>{tr('Renunță')}</button>
+            <button className="btn primary" onClick={save}>{tr('Salvează')}</button>
           </div>
         </div>
       </div>
@@ -109,15 +111,15 @@ export default function ReservationModal({ initial, date, store, onSave, onDelet
       {confirmDel && (
         <div className="overlay show" onMouseDown={(e) => e.target === e.currentTarget && setConfirmDel(false)}>
           <div className="modal" style={{ maxWidth: 420 }}>
-            <h2 style={{ fontSize: 19 }}>Ștergi rezervarea?</h2>
+            <h2 style={{ fontSize: 19 }}>{tr('Ștergi rezervarea?')}</h2>
             <p className="hint">
-              {initial.client} — {fmtDate(initial.data)}. Acțiunea nu poate fi anulată. (Poți și să schimbi statusul în „Anulat”.)
+              {initial.client} — {fmtDate(initial.data, lang)}. {tr('Acțiunea nu poate fi anulată. (Poți și să schimbi statusul în „Anulat”.)')}
             </p>
             <div className="foot">
               <span />
               <div style={{ display: 'flex', gap: 8 }}>
-                <button className="btn" onClick={() => setConfirmDel(false)}>Nu</button>
-                <button className="btn primary danger-fill" onClick={() => onDelete(initial.id)}>Da, șterge</button>
+                <button className="btn" onClick={() => setConfirmDel(false)}>{tr('Nu')}</button>
+                <button className="btn primary danger-fill" onClick={() => onDelete(initial.id)}>{tr('Da, șterge')}</button>
               </div>
             </div>
           </div>

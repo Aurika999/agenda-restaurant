@@ -1,0 +1,10 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Fiecare cont vede și modifică doar propriile date:
+    // users/{uid}, users/{uid}/reservations/*, users/{uid}/contracts/*
+    match /users/{uid}/{document=**} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+  }
+}

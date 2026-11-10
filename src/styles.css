@@ -12,6 +12,12 @@ button,input,select,textarea{font:inherit;color:inherit}
 header.top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px}
 header.top h1{font-size:28px;color:var(--accent)}
 header.top .sub{color:var(--muted);font-size:13px}
+header.top .top-acts{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.lang-switch{display:flex;gap:4px;padding:4px;background:var(--card);border:2px solid var(--accent);border-radius:999px}
+.lang-switch button{display:flex;align-items:center;gap:6px;border:0;background:none;padding:6px 12px;border-radius:999px;cursor:pointer;font-weight:700;color:var(--accent);letter-spacing:.5px}
+.lang-switch button:hover{background:var(--soft)}
+.lang-switch button.on{background:var(--accent);color:#fff}
+.lang-switch .flag{width:20px;height:14px;border-radius:3px;box-shadow:0 0 0 1px rgba(0,0,0,.15);flex:none}
 nav.tabs{display:flex;gap:6px;background:var(--card);padding:5px;border-radius:999px;border:1px solid var(--line)}
 nav.tabs button{border:0;background:none;padding:8px 16px;border-radius:999px;cursor:pointer;color:var(--muted);font-weight:500}
 nav.tabs button.on{background:var(--accent);color:#fff}
@@ -114,3 +120,13 @@ legend{font-weight:600;font-size:13px;color:var(--accent);padding:0 6px}
 .hint{color:var(--muted);margin:0 0 14px;font-size:13px}
 .btn.primary.danger-fill{background:var(--no);border-color:var(--no);color:#fff}
 .btn:disabled{opacity:.6;cursor:wait}
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.login{width:100%;max-width:380px;display:flex;flex-direction:column;gap:12px}
+.login h2{color:var(--accent);font-size:26px}
+.btn.link{border:0;background:none;color:var(--accent);text-decoration:underline;padding:4px}
+.cloud-status{align-self:center;font-size:13px;color:var(--muted)}
+.cloud-status.saved{color:var(--ok)}
+.cloud-status.error{color:var(--no)}
+.auth-tabs{display:flex;gap:4px;padding:4px;background:var(--soft);border-radius:999px}
+.auth-tabs button{flex:1;border:0;background:none;padding:7px 10px;border-radius:999px;cursor:pointer;font-weight:600;color:var(--muted)}
+.auth-tabs button.on{background:var(--accent);color:#fff}

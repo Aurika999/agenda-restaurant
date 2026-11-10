@@ -22,7 +22,24 @@ Pentru o versiune finală: `npm run build`. Rezultatul apare în folderul `dist/
 - Setări: datele firmei și condițiile contractului (termene confirmare/plată/anulare, clauze proprii)
 - Backup / import date (.json)
 
-Datele se salvează în browser (localStorage); fă periodic un backup din Setări.
+## Salvare date
+
+**Fără Firebase:** datele stau doar în browser (localStorage); fă periodic un backup din Setări.
+
+**Cu Firebase (recomandat):** rezervările, setările și o copie a fiecărui contract se salvează în Firestore și apar pe orice dispozitiv după autentificare.
+
+1. Creează un proiect pe https://console.firebase.google.com
+2. **Build → Authentication → Get started → Email/Password → Enable**. Apoi, la **Users → Add user**, creează contul (email + parolă).
+3. **Build → Firestore Database → Create database** (locație `eur3 (europe-west)`, mod *production*). La **Rules**, lipește conținutul din `firestore.rules` și apasă *Publish*.
+4. **Project settings → General → Your apps → Web (</>)**: înregistrează aplicația și copiază valorile `firebaseConfig`.
+5. Copiază `.env.example` ca `.env.local`, completează valorile și repornește `npm run dev`.
+
+La prima autentificare, dacă cloud-ul e gol, datele existente din browser se urcă automat.
+
+Structura în Firestore (separat pentru fiecare cont):
+- `users/{uid}` – setări + numărul următorului contract
+- `users/{uid}/reservations/{id}` – rezervări
+- `users/{uid}/contracts/{id}` – copia contractului (HTML + text), salvată la fiecare deschidere dacă s-a schimbat
 
 ## Structură
 - `src/App.jsx` – navigare și ferestre
