@@ -1,0 +1,92 @@
+import { DOW, MONTHS, iso, fmtDateLong, money, num, sortRes, todayIso, totals } from '../utils';
+import ReservationCard from './ReservationCard.jsx';
+
+function Stats({ store, month }) {
+  const today = todayIso();
+  const active = store.reservations.filter((r) => r.status !== 'anulat');
+  const inMonth = active.filter((r) => r.data.startsWith(month));
+  const upcoming = active.filter((r) => r.data >= today);
+  const guests = inMonth.reduce((s, r) => s + num(r.persoane) + num(r.copii), 0);
+  const due = upcoming.reduce((s, r) => s + Math.max(0, totals(r).rest), 0);
+  const mName = MONTHS[+month.split('-')[1] - 1];
+  const items = [
+    [upcoming.length, 'Rezervări viitoare'],
+    [inMonth.length, `Evenimente în ${mName}`],
+    [guests, `Invitați în ${mName}`],
+    [money(due, store.settings.moneda), 'De încasat (viitoare)'],
+  ];
+  return (
+    <div className="stats">
+      {items.map(([v, l]) => (
+        <div className="stat" key={l}><div className="v">{v}</div><div className="l">{l}</div></div>
+      ))}
+    </div>
+  );
+}
+
+export default function CalendarView({ store, sel, setSel, month, setMonth, onNew, onEdit, onContract }) {
+  const [y, m] = month.split('-').map(Number);
+  const today = todayIso();
+  const first = new Date(y, m - 1, 1);
+  const start = new Date(first);
+  start.setDate(1 - ((first.getDay() + 6) % 7));
+
+  const days = [];
+  for (let i = 0; i < 42; i++) {
+    const d = new Date(start);
+    d.setDate(start.getDate() + i);
+    if (i >= 35 && d.getMonth() !== m - 1) break;
+    days.push(d);
+  }
+
+  const shift = (k) => setMonth(iso(new Date(y, m - 1 + k, 1)).slice(0, 7));
+  const pick = (s) => { setSel(s); if (s.slice(0, 7) !== month) setMonth(s.slice(0, 7)); };
+  const dayRes = sortRes(store.reservations.filter((r) => r.data === sel));
+
+  return (
+    <section>
+      <Stats store={store} month={month} />
+      <div className="grid2">
+        <div className="card">
+          <div className="cal-head">
+            <button className="btn sm" onClick={() => shift(-1)}>‹</button>
+            <h2>{MONTHS[m - 1]} {y}</h2>
+            <div style={{ display: 'flex', gap: 6 }}>
+              <button className="btn sm" onClick={() => pick(today)}>Azi</button>
+              <button className="btn sm" onClick={() => shift(1)}>›</button>
+            </div>
+          </div>
+          <div className="cal">
+            {DOW.map((d) => <div className="dow" key={d}>{d}</div>)}
+            {days.map((d) => {
+              const s = iso(d);
+              const rs = sortRes(store.reservations.filter((r) => r.data === s));
+              const cls = ['d', d.getMonth() !== m - 1 && 'out', s === today && 'today', s === sel && 'sel', rs.length && 'has']
+                .filter(Boolean).join(' ');
+              return (
+                <div key={s} className={cls} onClick={() => pick(s)}>
+                  <span className="n">{d.getDate()}</span>
+                  {rs.slice(0, 2).map((r) => (
+                    <span key={r.id} className={'chip ' + r.status}>{(r.oraStart ? r.oraStart + ' ' : '') + r.client}</span>
+                  ))}
+                  {rs.length > 2 && <span className="more">+{rs.length - 2} încă</span>}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+        <div className="card">
+          <div className="day-title">
+            <h3>{fmtDateLong(sel)}</h3>
+            <button className="btn sm" onClick={() => onNew(sel)}>+ Adaugă</button>
+          </div>
+          {dayRes.length
+            ? dayRes.map((r) => (
+              <ReservationCard key={r.id} r={r} cur={store.settings.moneda} onEdit={onEdit} onContract={onContract} />
+            ))
+            : <div className="empty">Nicio rezervare în această zi.</div>}
+        </div>
+      </div>
+    </section>
+  );
+}
