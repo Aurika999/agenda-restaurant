@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { EMPTY_RESERVATION, EVENT_TYPES, STATUS, findConflicts, fmtDate, money, num, salaList, totals } from '../utils';
 import { useLang } from '../i18n.jsx';
+import TimeInput from './TimeInput.jsx';
 
 function Field({ label, cls = '', children }) {
   return <div className={'f ' + cls}><label>{label}</label>{children}</div>;
@@ -51,8 +52,12 @@ export default function ReservationModal({ initial, date, store, onSave, onDelet
                 <select value={f.tip} onChange={set('tip')}>{EVENT_TYPES.map((x) => <option key={x} value={x}>{tr(x)}</option>)}</select>
               </Field>
               <Field label={tr('Data *')}>{inp('data', { type: 'date', required: true })}</Field>
-              <Field label={tr('Ora început')}>{inp('oraStart', { type: 'time' })}</Field>
-              <Field label={tr('Ora sfârșit')}>{inp('oraSfarsit', { type: 'time' })}</Field>
+              <Field label={tr('Ora început')}>
+                <TimeInput value={f.oraStart} onChange={(v) => setF({ ...f, oraStart: v })} ariaLabel={tr('Ora început')} optional />
+              </Field>
+              <Field label={tr('Ora sfârșit')}>
+                <TimeInput value={f.oraSfarsit} onChange={(v) => setF({ ...f, oraSfarsit: v })} ariaLabel={tr('Ora sfârșit')} optional />
+              </Field>
               <Field label={tr('Nr. persoane adulți *')}>{inp('persoane', { type: 'number', min: 1, required: true })}</Field>
               <Field label={tr('Nr. copii')}>{inp('copii', { type: 'number', min: 0 })}</Field>
               <Field label={tr('Sala / zona')} cls="c2">

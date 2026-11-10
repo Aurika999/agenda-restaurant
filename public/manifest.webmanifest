@@ -1,0 +1,16 @@
+{
+  "name": "Agenda Rezervări Restaurant",
+  "short_name": "Agenda",
+  "description": "Programul rezervărilor și contractele pentru evenimente",
+  "lang": "ro",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f7f3ee",
+  "theme_color": "#8a3b2f",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

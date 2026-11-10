@@ -9,18 +9,37 @@ html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Inter,sys
 h1,h2,h3{font-family:"Playfair Display",Georgia,serif;margin:0}
 button,input,select,textarea{font:inherit;color:inherit}
 .wrap{max-width:1180px;margin:0 auto;padding:20px 18px 60px}
-header.top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px}
-header.top h1{font-size:28px;color:var(--accent)}
-header.top .sub{color:var(--muted);font-size:13px}
+header.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+header.top h1{font-size:22px;line-height:1.15;color:var(--accent)}
+header.top .sub{color:var(--muted);font-size:12px}
 header.top .top-acts{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.lang-switch{display:flex;gap:4px;padding:4px;background:var(--card);border:2px solid var(--accent);border-radius:999px}
-.lang-switch button{display:flex;align-items:center;gap:6px;border:0;background:none;padding:6px 12px;border-radius:999px;cursor:pointer;font-weight:700;color:var(--accent);letter-spacing:.5px}
-.lang-switch button:hover{background:var(--soft)}
-.lang-switch button.on{background:var(--accent);color:#fff}
-.lang-switch .flag{width:20px;height:14px;border-radius:3px;box-shadow:0 0 0 1px rgba(0,0,0,.15);flex:none}
-nav.tabs{display:flex;gap:6px;background:var(--card);padding:5px;border-radius:999px;border:1px solid var(--line)}
-nav.tabs button{border:0;background:none;padding:8px 16px;border-radius:999px;cursor:pointer;color:var(--muted);font-weight:500}
-nav.tabs button.on{background:var(--accent);color:#fff}
+
+/* File: pastilă care alunecă sub fila activă */
+nav.tabs{position:relative;display:flex;gap:2px;background:var(--card);padding:3px;border-radius:999px;border:1px solid var(--line);box-shadow:0 1px 2px rgba(60,30,20,.05)}
+nav.tabs .slider{position:absolute;top:3px;bottom:3px;border-radius:999px;background:var(--accent);box-shadow:0 2px 8px rgba(138,59,47,.3);transition:left .3s cubic-bezier(.4,1.3,.5,1),width .3s cubic-bezier(.4,1.3,.5,1),opacity .2s;pointer-events:none}
+nav.tabs button{position:relative;z-index:1;display:flex;align-items:center;gap:6px;border:0;background:none;padding:6px 12px;border-radius:999px;cursor:pointer;color:var(--muted);font-weight:500;font-size:13.5px;transition:color .2s,background .2s,transform .1s}
+nav.tabs button:hover:not(.on){color:var(--accent);background:var(--soft)}
+nav.tabs button:active{transform:scale(.95)}
+nav.tabs button.on{color:#fff}
+nav.tabs .ico{font-size:14px;line-height:1;transition:transform .25s}
+nav.tabs button:hover .ico,nav.tabs button.on .ico{transform:scale(1.15) rotate(-6deg)}
+
+/* Limbă: comutator cu cursor glisant */
+.lang-switch{position:relative;display:grid;grid-template-columns:1fr 1fr;padding:3px;background:var(--card);border:1px solid var(--line);border-radius:999px;box-shadow:0 1px 2px rgba(60,30,20,.05)}
+.lang-switch .slider{position:absolute;top:3px;bottom:3px;left:3px;width:calc(50% - 3px);border-radius:999px;background:var(--accent);box-shadow:0 2px 8px rgba(138,59,47,.3);transform:translateX(calc(var(--i,0) * 100%));transition:transform .3s cubic-bezier(.4,1.3,.5,1);pointer-events:none}
+.lang-switch button{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;gap:5px;border:0;background:none;padding:5px 10px;border-radius:999px;cursor:pointer;font-weight:700;font-size:12px;color:var(--muted);letter-spacing:.4px;transition:color .2s,transform .1s}
+.lang-switch button:hover:not(.on){color:var(--accent)}
+.lang-switch button:active{transform:scale(.92)}
+.lang-switch button.on{color:#fff}
+.lang-switch .flag{width:16px;height:11px;border-radius:2px;box-shadow:0 0 0 1px rgba(0,0,0,.15);flex:none;transition:transform .25s}
+.lang-switch button:hover .flag{transform:scale(1.15)}
+
+
+nav.tabs button:focus-visible,.lang-switch button:focus-visible,.btn:focus-visible{outline:2px solid var(--accent-2);outline-offset:2px}
+@media (max-width:860px){
+  nav.tabs{order:3;width:100%;justify-content:space-between}
+  nav.tabs button{flex:1;justify-content:center;padding:7px 6px;font-size:12.5px}
+}
 .btn{border:1px solid var(--line);background:var(--card);padding:9px 16px;border-radius:10px;cursor:pointer;font-weight:500}
 .btn:hover{border-color:var(--accent-2)}
 .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
@@ -130,3 +149,17 @@ legend{font-weight:600;font-size:13px;color:var(--accent);padding:0 6px}
 .auth-tabs{display:flex;gap:4px;padding:4px;background:var(--soft);border-radius:999px}
 .auth-tabs button{flex:1;border:0;background:none;padding:7px 10px;border-radius:999px;cursor:pointer;font-weight:600;color:var(--muted)}
 .auth-tabs button.on{background:var(--accent);color:#fff}
+.btn.install-btn{display:flex;align-items:center;gap:6px;padding:6px 12px;font-size:13px;font-weight:600;border-radius:999px;color:var(--accent);border-color:var(--line);transition:transform .15s,background .15s,border-color .15s}
+.btn.install-btn svg{width:15px;height:15px;transition:transform .25s}
+.btn.install-btn:hover{background:var(--soft);border-color:var(--accent-2);transform:translateY(-1px)}
+.btn.install-btn:hover svg{transform:translateY(2px)}
+.btn.install-btn:active{transform:scale(.95)}
+.login-install{display:flex;justify-content:center}
+.login-install:empty{display:none}
+.time-input{display:flex;align-items:center;gap:4px}
+.time-input select{flex:1;min-width:0;text-align:center;font-variant-numeric:tabular-nums;cursor:pointer}
+.time-input select:disabled{cursor:default;opacity:.6}
+.time-input .sep{font-weight:600;color:var(--muted)}
+.time-input .clear{border:0;background:none;color:var(--muted);cursor:pointer;padding:4px 6px;border-radius:6px;font-size:12px}
+.time-input .clear:hover{color:var(--no);background:var(--no-bg)}
+@media (prefers-reduced-motion:reduce){ nav.tabs .slider,.lang-switch .slider{transition:none} }

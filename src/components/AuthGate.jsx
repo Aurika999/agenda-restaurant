@@ -4,6 +4,7 @@ import {
 } from 'firebase/auth';
 import { auth, firebaseEnabled } from '../firebase';
 import { useLang } from '../i18n.jsx';
+import InstallButton from './InstallButton.jsx';
 
 const ERRORS = {
   'auth/invalid-credential': 'Email sau parolă greșită.',
@@ -90,6 +91,7 @@ function Login() {
         <button className="btn primary" type="submit" disabled={busy}>{t(busy ? 'Se conectează…' : mode === 'register' ? 'Creează cont' : 'Intră în cont')}
         </button>
         {mode === 'login' && <button className="btn link" type="button" onClick={reset}>{t('Am uitat parola')}</button>}
+        <div className="login-install"><InstallButton /></div>
       </form>
     </div>
   );

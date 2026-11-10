@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useStore } from './useStore';
 import { todayIso } from './utils';
 import { useLang } from './i18n.jsx';
@@ -7,8 +7,27 @@ import ReservationList from './components/ReservationList.jsx';
 import SettingsView from './components/SettingsView.jsx';
 import ReservationModal from './components/ReservationModal.jsx';
 import ContractModal from './components/ContractModal.jsx';
+import InstallButton from './components/InstallButton.jsx';
 
-const VIEWS = { calendar: 'Calendar', lista: 'Toate rezervările', setari: 'Setări restaurant' };
+const VIEWS = { calendar: 'Calendar', lista: 'Toate rezervările', setari: 'Setări' };
+const VIEW_ICONS = { calendar: '📅', lista: '📋', setari: '⚙️' };
+
+/** Pastila care alunecă sub fila activă (poziția se măsoară din butonul activ). */
+function useSlider(dep) {
+  const ref = useRef();
+  const [style, setStyle] = useState({ opacity: 0 });
+  useLayoutEffect(() => {
+    const place = () => {
+      const on = ref.current?.querySelector('button.on');
+      if (on) setStyle({ left: on.offsetLeft, width: on.offsetWidth, opacity: 1 });
+    };
+    place();
+    window.addEventListener('resize', place);
+    document.fonts?.ready.then(place);
+    return () => window.removeEventListener('resize', place);
+  }, [dep]);
+  return [ref, style];
+}
 
 const Flag = ({ stripes, vertical }) => (
   <svg className="flag" viewBox="0 0 3 2" aria-hidden="true">
@@ -30,6 +49,7 @@ export default function App({ user }) {
     const h = window.location.hash.slice(1);
     return VIEWS[h] ? h : 'calendar';
   });
+  const [tabsRef, tabsSlider] = useSlider(view + lang + store.ready);
   const [sel, setSel] = useState(todayIso());
   const [month, setMonth] = useState(todayIso().slice(0, 7));
   const [editing, setEditing] = useState(null); // {reservation|null, date}
@@ -95,13 +115,18 @@ export default function App({ user }) {
             <h1>{store.settings.restaurant || t('Agenda Rezervări')}</h1>
             <div className="sub">{t('Programul rezervărilor și contractele pentru evenimente')}</div>
           </div>
-          <nav className="tabs">
+          <nav className="tabs" ref={tabsRef}>
+            <span className="slider" style={tabsSlider} aria-hidden="true" />
             {Object.entries(VIEWS).map(([k, label]) => (
-              <button key={k} className={view === k ? 'on' : ''} onClick={() => setView(k)}>{t(label)}</button>
+              <button key={k} className={view === k ? 'on' : ''} aria-current={view === k ? 'page' : undefined} onClick={() => setView(k)}>
+                <span className="ico" aria-hidden="true">{VIEW_ICONS[k]}</span>{t(label)}
+              </button>
             ))}
           </nav>
           <div className="top-acts">
-            <div className="lang-switch" role="group" aria-label="Limba / Мова">
+            <InstallButton toast={toast} />
+            <div className="lang-switch" role="group" aria-label="Limba / Мова" style={{ '--i': lang === 'uk' ? 1 : 0 }}>
+              <span className="slider" aria-hidden="true" />
               {LANGS.map(({ code, label, title, flag }) => (
                 <button
                   key={code}
@@ -114,7 +139,6 @@ export default function App({ user }) {
                 </button>
               ))}
             </div>
-            <button className="btn primary" onClick={() => openNew()}>{t('+ Rezervare nouă')}</button>
           </div>
         </header>
 
